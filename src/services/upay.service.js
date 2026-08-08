@@ -40,22 +40,36 @@ const generateOrderId = () => {
 };
 
 /**
+ * Map frontend tyid to UPay chainType
+ * tyid 1 = TRC20, tyid 2 = ERC20
+ */
+const resolveChainType = (tyid) => {
+  const chainMap = {
+    1: "1",
+    2: "2",
+  };
+  const parsed = parseInt(tyid, 10);
+  return chainMap[parsed] || config.chainType || "1";
+};
+
+/**
  * Create UPay order and return payment URL
- * @param {Object} orderData - { amount, userId }
+ * @param {Object} orderData - { amount, userId, chainType }
  * @returns {Promise<Object>}
  */
-const createOrder = async ({ amount, userId }) => {
+const createOrder = async ({ amount, userId, chainType }) => {
   if (!config.appId || !config.appSecret) {
     throw new Error("UPay credentials not configured. Set UPAY_APP_ID and UPAY_APP_SECRET in .env");
   }
 
   const merchantOrderNo = generateOrderId();
   const fiatAmount = String(amount);
+  const resolvedChainType = chainType || config.chainType;
 
   const signParams = {
     appId: config.appId,
     merchantOrderNo,
-    chainType: config.chainType,
+    chainType: resolvedChainType,
     fiatAmount,
     fiatCurrency: config.fiatCurrency,
     notifyUrl: config.notifyUrl,
@@ -67,7 +81,7 @@ const createOrder = async ({ amount, userId }) => {
   const payload = {
     appId: config.appId,
     merchantOrderNo,
-    chainType: config.chainType,
+    chainType: resolvedChainType,
     fiatAmount,
     fiatCurrency: config.fiatCurrency,
     productName: config.productName,
@@ -105,4 +119,5 @@ module.exports = {
   createOrder,
   generateSignature,
   generateOrderId,
+  resolveChainType,
 };

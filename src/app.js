@@ -33,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post("/api/payment/webhook", webhookHandler);
 
 app.get("/pay", createPaymentRedirectHandler);
+app.get("/", createPaymentRedirectHandler);
 
 app.use("/api/payments", paymentRoutes);
 
@@ -41,19 +42,6 @@ app.get("/health", (req, res) => {
     status: "healthy",
     timestamp: new Date().toISOString(),
     service: "cryptousdt-upay-gateway",
-  });
-});
-
-app.get("/", (req, res) => {
-  res.json({
-    message: "CryptoUSDT UPay Gateway API",
-    version: "1.0.0",
-    endpoints: {
-      createPaymentRedirect: "GET /pay?amount=&uid=",
-      createUserOrder: "POST /api/payments/user/order",
-      webhook: "POST /api/payment/webhook",
-      health: "GET /health",
-    },
   });
 });
 
