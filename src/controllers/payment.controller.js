@@ -55,8 +55,10 @@ const createPaymentRedirectHandler = async (req, res) => {
   try {
     const amount = parseFloat(req.query.amount);
     const uid = parseInt(req.query.uid, 10);
+    const tyid = req.query.tyid;
+    const chainType = upayService.resolveChainType(tyid);
 
-    logger.logIncoming("PayIn:Redirect", "/pay", { amount, uid });
+    logger.logIncoming("PayIn:Redirect", req.originalUrl, { amount, uid, tyid, chainType });
 
     if (!amount || !uid) {
       return res.status(400).json({
@@ -68,6 +70,7 @@ const createPaymentRedirectHandler = async (req, res) => {
     const { payUrl, merchantOrderNo } = await upayService.createOrder({
       amount,
       userId: uid,
+      chainType,
     });
 
     await insertRechargeRecord({
@@ -90,7 +93,8 @@ const createPaymentRedirectHandler = async (req, res) => {
 
 const createUserOrderHandler = async (req, res) => {
   try {
-    const { amount, userId, user_mobile } = req.body;
+    const { amount, userId, user_mobile, tyid } = req.body;
+    const chainType = upayService.resolveChainType(tyid);
 
     logger.logIncoming("PayIn:createUserOrder", "/api/payments/user/order", req.body);
 
@@ -104,6 +108,7 @@ const createUserOrderHandler = async (req, res) => {
     const { payUrl, merchantOrderNo } = await upayService.createOrder({
       amount,
       userId,
+      chainType,
     });
 
     await insertRechargeRecord({
