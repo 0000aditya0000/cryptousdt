@@ -4,8 +4,8 @@
   "description": "UPay USDT Payment Gateway for Node.js (Rollix777)",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "npx nodemon src/app.js"
+    "start": "node api.js && node src/app.js",
+    "dev": "node api.js && npx nodemon src/app.js"
   },
   "dependencies": {
     "axios": "^1.6.2",
